@@ -17,21 +17,45 @@ class Main:
         # Creates an array of each line in the file
         patients = file.readlines()        
         for line in patients:
-            # Temp solution for parsing
-            i = 0
+            # Initializing variables
+            i = 0            
+            arivalTime = ""
+            code = ""
+            treatmentTime = ""
+
             # Gets the first number
-            while line != ' ':
-                temp = line[i]
-                arivalTime += temp
-                i+=1
-            # Gets the code
-
+            # Loops until new line is found (Applies to all loops)
+            # Grabs values that aren't whitespace (Applies to all loops)
+            while line[i] != '\n' :
+                if(line[i].isspace()):
+                    break
+                else:
+                    temp = line[i]
+                    arivalTime += temp
+                    i+=1
+            # Gets the "code"
+            i+=1
+            while line[i] != '\n' :
+                if(line[i].isspace()):
+                    break
+                else:
+                    temp = line[i]
+                    code += temp
+                    i+=1
             # Gets the treatmentTime
-
-            # Creates object and adds to queue
-                
-            print(arivalTime)
-            time.sleep(1)
+            i+=1
+            while line[i] != '\n' : # Leads to index out of bounds error on the last incrementation of i
+                if(line[i].isspace()):
+                    break
+                else:
+                    temp = line[i]
+                    treatmentTime += temp
+                    i+=1
+            # Creates object and prints out the input files info
+            # Casts strings to ints where needed
+            temp = Patient(int(arivalTime),code,int(treatmentTime))
+            temp.viewInfo()            
+            time.sleep(1) # Used for debugging
 
 
 class Patient:
@@ -39,9 +63,13 @@ class Patient:
     def __init__(self,arivalTime,code,treatmentTime):        
         self.arivalTime      = arivalTime 
         self.code            = code
-        self.treatmentTime   = 0   
+        self.treatmentTime   = treatmentTime   
         self.idNum           = 0
-    
+
+    def viewInfo(self):
+        print(str(self.arivalTime) + " " + self.code + " " + str(self.treatmentTime))
+
+
 if __name__ == "__main__":
     prog = Main()
     prog.arrival()
