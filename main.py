@@ -1,12 +1,14 @@
 import time
-
+from random import randint 
+from queue import PriorityQueue
 class Main:
 
     def __init__(self):        
         self.currentTime = 0
         self.fileName = ""
         self.patNum = 28064212
-        self.queue = []
+        self.queue = PriorityQueue()
+        
     
     def getfile(self):
         self.fileName = input("Enter local filename: ")
@@ -56,13 +58,42 @@ class Main:
             # Creates object and prints out the input files info
             # Casts strings to ints where needed
             tempID = (self.patNum + j)            
-            temp = Patient(int(arivalTime),code,int(treatmentTime),tempID)
-            temp.viewInfo()           
-            # Adds patient to the queue 
-            self.queue.append(temp)       
+            temp = Patient(int(arivalTime),code,int(treatmentTime),tempID) 
+
+            # Sets arrival time
+            if i == 0:
+                self.currentTime += int(arivalTime)
+            elif i > 0:
+                self.currentTime += ( int(arivalTime) - self.currentTime )
+
+            # Patient arrived            
+            print("Time " + str(self.currentTime) + ": " + str(temp.idNum) + " " + str(temp.code) + " arrives")
+            if code == 'E':
+                # Goto waiting room
+                temp.setPriortiy(1)
+                self.queue.put(temp,1)
+                self.waitingRoom() 
+            elif code == 'W':
+                # Goto assesment Queue
+                self.assessment(temp)      
+                self.waitingRoom()           
+            else:
+                print("Patient " + str(tempID) + " does not have an arival code.")                  
             j+=1     
             # time.sleep(1) # Used for debugging        
 
+    def assessment(self,patient):
+        # Gives patient a random priority level
+        rand = randint(0,6)
+        patient.setPriortiy(rand)
+        # Incremets sys time by 4s
+        self.currentTime += 4
+        # Adds patient to waiting queue
+        self.queue.put(patient,rand)
+        
+    def waitingRoom(self):
+       temp = self.queue.get()
+       temp.viewInfo()
 
 class Patient:
 
@@ -71,6 +102,7 @@ class Patient:
         self.code            = code
         self.treatmentTime   = treatmentTime   
         self.idNum           = idNum
+        self.priority        = 0
 
     def viewInfo(self):
         print(str(self.arivalTime) + " " + self.code + " " + str(self.treatmentTime) + " " + str(self.idNum))
@@ -84,7 +116,11 @@ class Patient:
     def getArivalTime(self):
         return self.arivalTime
 
+    def setPriortiy(self,num):
+        self.priority += num
+
 
 if __name__ == "__main__":
     prog = Main()
     prog.arrival()
+    
