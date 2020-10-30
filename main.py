@@ -22,7 +22,7 @@ class Main:
             arivalTime = ""
             code = ""
             treatmentTime = ""
-
+            length = len(line)
             # Gets the first number
             # Loops until new line is found (Applies to all loops)
             # Grabs values that aren't whitespace (Applies to all loops)
@@ -44,7 +44,7 @@ class Main:
                     i+=1
             # Gets the treatmentTime
             i+=1
-            while line[i] != '\n' : # Leads to index out of bounds error on the last incrementation of i
+            while i < length and line[i] != '\n' :
                 if(line[i].isspace()):
                     break
                 else:
