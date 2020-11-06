@@ -70,12 +70,12 @@ class Main:
                 self.currentTime += int(arivalTime)
             elif j > 0:
                 self.currentTime += ( int(arivalTime) - self.currentTime )
-            # Patient arrived            
+            # Patient arrived   
+            self.patients.append(temp)         
             self.arrived(temp)                  
             j+=1     
-            # time.sleep(1) # Used for debugging   
-        for ppl in self.patients:
-            self.arrived(ppl)     
+            # time.sleep(1) # Used for debugging  
+             
 
     def arrived(self,patient):
         print("Time " + str(self.currentTime) + ": " + str(patient.idNum) + " " + str(patient.code) + " arrives")
@@ -110,9 +110,7 @@ class Main:
             print("Time " + str(self.currentTime) + ": " + str(temp.idNum) + " (Priority " + str(temp.priority) + ") starting treatment " + str(self.remainingRooms) + " rm(s) remaining")  
             self.treatment(temp)                                 
         else:
-            print("gotta wait bucko")
-            
-        
+            print("gotta wait bucko")       
 
     def treatment(self,patient):        
         # Finish treatment
@@ -128,7 +126,13 @@ class Main:
             print("Time " + str(self.currentTime) + ": " + str(patient.idNum) + " (Priority " + str(patient.priority) + ") admitted to hospital")            
             print("Time " + str(self.currentTime) + ": " + str(patient.idNum) + " (Priority " + str(patient.priority) + ") departs " + str(self.remainingRooms) + " rm(s) remaining")
             
-
+    def patientSummary(self):
+        print("Patient summary")
+        print("Patient Priority   Arrival Assessment   Treatment   Departure  Waiting")
+        print("Number               Time       Time    Required        Time     Time")
+        print("-----------------------------------------------------------------------")
+        for x in self.patients:
+            print(str(x.idNum) + "        " + str(x.priority) + "        " + str(x.arivalTime) + "        " + str(x.treatmentTime))
 class Patient:
 
     def __init__(self,arivalTime,code,treatmentTime,idNum):        
@@ -158,4 +162,5 @@ class Patient:
 if __name__ == "__main__":
     prog = Main()
     prog.arrival()
+    prog.patientSummary()
     
