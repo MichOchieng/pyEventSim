@@ -125,8 +125,7 @@ class Main:
         else:
             # Hospital admision
             self.currentTime += 3
-            print("Time " + str(self.currentTime) + ": " + str(patient.idNum) + " (Priority " + str(patient.priority) + ") admitted to hospital")
-            self.currentTime += 1
+            print("Time " + str(self.currentTime) + ": " + str(patient.idNum) + " (Priority " + str(patient.priority) + ") admitted to hospital")            
             print("Time " + str(self.currentTime) + ": " + str(patient.idNum) + " (Priority " + str(patient.priority) + ") departs " + str(self.remainingRooms) + " rm(s) remaining")
             
 
