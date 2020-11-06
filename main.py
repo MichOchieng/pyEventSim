@@ -1,13 +1,18 @@
 import time
 from random import randint 
 from queue import PriorityQueue
+
 class Main:
 
     def __init__(self):        
-        self.currentTime = 0
-        self.fileName = ""
-        self.patNum = 28064212
-        self.queue = PriorityQueue()
+        self.currentTime    = 0
+        self.arrivalTime    = 0
+        self.fileName       = ""
+        self.patNum         = 28064212
+        self.patients       = []
+        self.queue          = PriorityQueue()
+        self.remainingRooms = 3
+        self.waitStart      = 0
         
     
     def getfile(self):
@@ -61,39 +66,69 @@ class Main:
             temp = Patient(int(arivalTime),code,int(treatmentTime),tempID) 
 
             # Sets arrival time
-            if i == 0:
+            if j == 0:
                 self.currentTime += int(arivalTime)
-            elif i > 0:
+            elif j > 0:
                 self.currentTime += ( int(arivalTime) - self.currentTime )
-
             # Patient arrived            
-            print("Time " + str(self.currentTime) + ": " + str(temp.idNum) + " " + str(temp.code) + " arrives")
-            if code == 'E':
-                # Goto waiting room
-                temp.setPriortiy(1)
-                self.queue.put(temp,1)
-                self.waitingRoom() 
-            elif code == 'W':
-                # Goto assesment Queue
-                self.assessment(temp)      
-                self.waitingRoom()           
-            else:
-                print("Patient " + str(tempID) + " does not have an arival code.")                  
+            self.arrived(temp)                  
             j+=1     
-            # time.sleep(1) # Used for debugging        
+            # time.sleep(1) # Used for debugging   
+        for ppl in self.patients:
+            self.arrived(ppl)     
+
+    def arrived(self,patient):
+        print("Time " + str(self.currentTime) + ": " + str(patient.idNum) + " " + str(patient.code) + " arrives")
+        if patient.code == 'E':
+            # Goto waiting room
+            patient.setPriortiy(1)
+            self.queue.put(patient,1)                        
+            self.waitingRoom()  
+        elif patient.code == 'W':
+            # Goto assesment Queue
+            self.assessment(patient)                 
+            self.waitingRoom()           
+        else:
+            print("Patient " + str(patient.idNum) + " does not have an arival code.")
 
     def assessment(self,patient):
+        print("Time " + str(self.currentTime) + ": " + str(patient.idNum) + " (Priority " + str(patient.priority) + ") starting assessment")
         # Gives patient a random priority level
-        rand = randint(0,6)
+        rand = randint(1,5)
         patient.setPriortiy(rand)
         # Incremets sys time by 4s
         self.currentTime += 4
-        # Adds patient to waiting queue
-        self.queue.put(patient,rand)
+        # Adds patient to waiting room queue
+        self.queue.put(patient,rand)       
+        print("Time " + str(self.currentTime) + ": " + str(patient.idNum) + " assessment complete priority now level " + str(patient.priority)) 
         
     def waitingRoom(self):
-       temp = self.queue.get()
-       temp.viewInfo()
+        temp = self.queue.get()
+        print("Time " + str(self.currentTime) + ": " + str(temp.idNum) + " (Priority " + str(temp.priority) + ") entered the waiting room")
+        if self.remainingRooms > 0:
+            self.remainingRooms -= 1 
+            print("Time " + str(self.currentTime) + ": " + str(temp.idNum) + " (Priority " + str(temp.priority) + ") starting treatment " + str(self.remainingRooms) + " rm(s) remaining")  
+            self.treatment(temp)                                 
+        else:
+            print("gotta wait bucko")
+            
+        
+
+    def treatment(self,patient):        
+        # Finish treatment
+        self.currentTime += patient.treatmentTime
+        print("Time " + str(self.currentTime) + ": " + str(patient.idNum) + " (Priority " + str(patient.priority) + ") finished treatment")
+        self.remainingRooms += 1
+        if patient.priority > 1:
+            self.currentTime += 1
+            print("Time " + str(self.currentTime) + ": " + str(patient.idNum) + " (Priority " + str(patient.priority) + ") departs " + str(self.remainingRooms) + " rm(s) remaining")            
+        else:
+            # Hospital admision
+            self.currentTime += 3
+            print("Time " + str(self.currentTime) + ": " + str(patient.idNum) + " (Priority " + str(patient.priority) + ") admitted to hospital")
+            self.currentTime += 1
+            print("Time " + str(self.currentTime) + ": " + str(patient.idNum) + " (Priority " + str(patient.priority) + ") departs " + str(self.remainingRooms) + " rm(s) remaining")
+            
 
 class Patient:
 
@@ -103,6 +138,7 @@ class Patient:
         self.treatmentTime   = treatmentTime   
         self.idNum           = idNum
         self.priority        = 0
+        self.waitTime        = 0
 
     def viewInfo(self):
         print(str(self.arivalTime) + " " + self.code + " " + str(self.treatmentTime) + " " + str(self.idNum))
