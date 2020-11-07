@@ -1,4 +1,6 @@
 import time
+import os
+import sys
 from random import randint 
 from queue import PriorityQueue
 
@@ -9,12 +11,9 @@ class Main:
         self.fileName       = ""
         self.patNum         = 28064212       
         self.remainingRooms = 3       
-        self.queue          = PriorityQueue()
-        self.nextAssessmentTime  = 0  
-        self.treatTime1     = 0
-        self.treatTime2     = 0
-        self.treatTime3     = 0
-        self.pastPatients   = []
+        self.queue          = PriorityQueue() # Holds events
+        self.nextAssessmentTime  = 0        
+        self.pastPatients   = [] # Used for patient summary
     
     def getfile(self):
         self.fileName = input("Enter local filename: ")
@@ -22,7 +21,12 @@ class Main:
 
     def start(self):        
         self.getfile()
-        file = open(self.fileName,"r") 
+        try:
+            file = open(self.fileName,"r")
+        except OSError:
+            print("Error opening file '" + self.fileName + "' please enter a valid file name from the current directory.")
+            sys.exit()
+        
         # Creates an array of each line in the file
         patients = file.readlines()        
         j = 0 # Used as an offset for patient IDs 
