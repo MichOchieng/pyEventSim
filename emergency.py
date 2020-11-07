@@ -7,7 +7,7 @@ from queue import PriorityQueue
 class Main:
 
     def __init__(self):        
-        self.currentTime    = 0        
+        self.currentTime    = 0  # Used for system time       
         self.fileName       = ""
         self.patNum         = 28064212       
         self.remainingRooms = 3       
@@ -74,28 +74,28 @@ class Main:
                 self.currentTime += int(arivalTime)
             elif j > 0:
                 self.currentTime += ( int(arivalTime) - self.currentTime )
-            # Patient arrived           
+            # Begins arrival event           
             self.arrival(temp)                    
             j+=1     
             # time.sleep(1) # Used for debugging  
              
     def arrival(self,patient):
+        # Adds arriving patient notification to event log
         temp = "Time " + str(self.currentTime) + ": " + str(patient.idNum) + " " + str(patient.code) + " arrives"  
         self.queue.put(temp,patient.arivalTime)
           
-        if patient.code == "W":
+        if patient.code == "W": # Sends walk in patients to assessment
             self.nextAssessmentTime = self.currentTime + 4            
             self.assessment(patient)
-        else:
+        else: # Allows emergency patients to skip assessment
             patient.setPriortiy(1)
             self.waitingRoom(patient)  
-            pass
+            
         
 
     def assessment(self,patient):
         # Determines if there is currently a patient beign assessed
         finishTime = self.currentTime + 4
-
         if finishTime != self.nextAssessmentTime: # assessment in progress at this time            
             futureTime = finishTime - self.nextAssessmentTime
             temp = "Time " + str(futureTime + finishTime) + ": " + str(patient.idNum) + " starting assessment"
@@ -122,7 +122,7 @@ class Main:
             # Adds patient to waiting room queue                 
             temp = "Time " + str(self.currentTime) + ": " + str(patient.idNum) + " assessment complete priority now level " + str(patient.priority)      
             self.queue.put(temp,self.currentTime)
-
+        # Sends patient to waiting room
         self.waitingRoom(patient)
 
     def waitingRoom(self,patient):
@@ -204,6 +204,6 @@ class Patient:
 
 if __name__ == "__main__":
     prog = Main()
-    prog.start()
-    prog.viewEvents()
-    prog.patientSummary()
+    prog.start()            # Starts event processing
+    prog.viewEvents()       # Prints event log
+    prog.patientSummary()   # Prints summary
